@@ -19,6 +19,11 @@ jobs:
         uses: astral-sh/setup-uv@v7
       - name: Install dependencies
         run: uv sync --locked
+      - name: Check package
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+          uv run pytest
       - name: Build package
         run: uv build
       - name: Publish package distributions to PyPI

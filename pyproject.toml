@@ -11,6 +11,9 @@ requires-python = ">=3.15"
 license = "GPL-3.0-only"
 dependencies = ["requests", "qrcode", "pillow", "playwright"]
 
+[project.scripts]
+lidlplus = "lidlplus_api.cli:main"
+
 [dependency-groups]
 dev = ["pytest", "ruff"]
 
