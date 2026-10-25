@@ -25,7 +25,7 @@ def receipt_destination(output, summary):
         if re.fullmatch(r"[A-Za-z0-9_-]{1,128}", ticket_id)
         else receipt_name(ticket_id)
     )
-    return Path(output) / purchased / f"{purchased}_{identifier}"
+    return Path(output) / purchased[:7] / purchased / f"{purchased}_{identifier}"
 
 
 def summary_path(stem):
@@ -135,7 +135,15 @@ def download_receipts(
                     stem = receipt_destination(output, summary)
                     raw = stem.with_suffix(".json")
                     legacy = output / receipt_name(ticket_id) / "receipt.json"
-                    cached = raw if raw.exists() else legacy
+                    previous_dated = output / stem.parent.name / raw.name
+                    cached = next(
+                        (
+                            path
+                            for path in (raw, previous_dated, legacy)
+                            if path.exists()
+                        ),
+                        raw,
+                    )
                     if cached.exists() and not overwrite:
                         detail = json.loads(cached.read_text(encoding="utf-8"))
                     else:
@@ -162,7 +170,7 @@ def convert_receipts(output, *, period=None, since=None, until=None):
     output = Path(output)
     paths = sorted(
         path
-        for path in output.glob("*/*.json")
+        for path in [*output.glob("*/*.json"), *output.glob("*/*/*.json")]
         if path.name != "summary.json" and not path.name.endswith("_summary.json")
     )
     if not paths:

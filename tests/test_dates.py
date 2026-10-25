@@ -161,4 +161,4 @@ def test_ranged_download_fetches_and_exports_only_selected_receipts(
     ) == (1, [])
     api.receipt.assert_called_once_with("selected")
     render.assert_called_once()
-    assert len(list(tmp_path.glob("2026-10-01/*_summary.json"))) == 1
+    assert len(list(tmp_path.glob("2026-10/2026-10-01/*_summary.json"))) == 1

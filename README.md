@@ -49,17 +49,18 @@ uv run lidlplus download
 
 The command follows all receipt pages, downloads every receipt's full JSON and
 renders the API's `htmlPrintedReceipt` using Chromium. Receipts are grouped by
-purchase date, with date-based filenames and the receipt ID to distinguish
-multiple purchases on the same day:
+purchase month and date, with date-based filenames and the receipt ID to
+distinguish multiple purchases on the same day:
 
 ```text
 receipts/
-  2026-10-24/
-    2026-10-24_<receipt-id>.json
-    2026-10-24_<receipt-id>_summary.json
-    2026-10-24_<receipt-id>.html
-    2026-10-24_<receipt-id>.jpg
-    2026-10-24_<receipt-id>.pdf
+  2026-10/
+    2026-10-24/
+      2026-10-24_<receipt-id>.json
+      2026-10-24_<receipt-id>_summary.json
+      2026-10-24_<receipt-id>.html
+      2026-10-24_<receipt-id>.jpg
+      2026-10-24_<receipt-id>.pdf
 ```
 
 The plain JSON is the untouched full API response; `_summary.json` stores list
@@ -76,8 +77,8 @@ except the failure report. Only receipts still made available by Lidl can be dow
 Run the same command again after an interruption. Already downloaded JSON is reused
 and JPG/PDF files are rebuilt. Older hash-named folders are also recognized as a
 cache: matching receipts are copied into the dated layout without refetching
-full details. Existing legacy files are retained. `convert` also supports both
-layouts and processes each matching receipt once.
+full details. Existing legacy files are retained. `convert` supports the old hash,
+flat date, and nested month/date layouts and processes each matching receipt once.
 Use `--overwrite` to fetch receipt details again:
 
 ```sh

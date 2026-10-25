@@ -78,7 +78,7 @@ def test_originals_survive_render_failure_and_resume(tmp_path, monkeypatch):
         .with_suffix(".json")
         .exists()
     )
-    assert len(list(tmp_path.glob("2026-10-24/*_summary.json"))) == 2
+    assert len(list(tmp_path.glob("2026-10/2026-10-24/*_summary.json"))) == 2
     api.receipt.reset_mock()
     render.side_effect = None
     count, failures = download_receipts(api, tmp_path, progress=lambda _: None)
@@ -107,8 +107,24 @@ def test_dated_export_reuses_legacy_cache_without_redownloading(tmp_path, monkey
         "2026-10-24_first",
         "2026-10-24_second",
     }
-    assert (tmp_path / "2026-10-24/2026-10-24_first.json").exists()
-    assert (tmp_path / "2026-10-24/2026-10-24_second_summary.json").exists()
+    assert (tmp_path / "2026-10/2026-10-24/2026-10-24_first.json").exists()
+    assert (tmp_path / "2026-10/2026-10-24/2026-10-24_second_summary.json").exists()
+
+
+def test_month_layout_reuses_flat_date_cache(tmp_path, monkeypatch):
+    summary = {"id": "flat-date", "date": "2026-10-24"}
+    folder = tmp_path / "2026-10-24"
+    folder.mkdir()
+    (folder / "2026-10-24_flat-date.json").write_text(
+        json.dumps({"htmlPrintedReceipt": "<p>Cached</p>"})
+    )
+    api = Mock()
+    api.iter_receipts.return_value = [summary]
+    monkeypatch.setattr("lidlplus_api.archive.renderer", MagicMock())
+    monkeypatch.setattr("lidlplus_api.archive.render_receipt", Mock())
+    assert download_receipts(api, tmp_path, progress=lambda _: None) == (1, [])
+    api.receipt.assert_not_called()
+    assert (tmp_path / "2026-10/2026-10-24/2026-10-24_flat-date.json").exists()
 
 
 def test_refresh_http_errors_do_not_replace_token(monkeypatch):
